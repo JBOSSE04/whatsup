@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Whatsup</title>
+    <link rel="icon" href="" type="image/x-icon">
+</head>
+
+<body>
+
+    <div id="contenedorNick">
+        <h4>Escribe tu Nombre y selecciona un avatar</h4><br>
+        <input type="text" name="" id="nombreUsuario" placeholder="Tu nick aquí">
+        <input type="text" name="" id="estado" value="Disponible">
+        <label for="avatarUsuario" class="custom-file-upload">
+            <i class="fas fa-cloud-upload-alt"></i> Subir Imagen
+        </label>
+        <input type="file" id="avatarUsuario" accept="image/*" onchange="displayFileName(this)" style="display:none;"><br>
+        <div id="fileName"></div>
+        <img id="imagePreview" src="#" alt="Vista previa de la imagen" style="display:none; max-width: 100px; max-height: 100px;">
+        
+        <button onclick="enviarNick()">Enviar</button>
+    </div>
+
+     
+
+    <div class="vistaprincipal" id="vistaprincipal" style="display: none;">
+        
+        <div id="opcionesChat" style="display: none;">
+            <div id="avatar-info" style="display: none;">
+                <div class="avatar-content">
+                    <div>
+                        <img id="avatar-image" src="avatares/avatardefault.png" alt="Avatar seleccionado">
+                        <span id="avatar-username"></span>
+                        <span id="avatar-estado"></span>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+            <div id="predeterminados">
+                <h4>Selecciona una opción</h4>
+                <div class="opcionChat" onclick="unirseChat('general')" tabindex="1"><img src="images/klipartz.com.png"><p>Chat general</p></div>
+                <div class="opcionChat" onclick="unirseChat('Chat1')" tabindex="2"><img src="images/descarga.jpg"><p>Chat de Crypto</p></div>
+                <div class="opcionChat" onclick="unirseChat('Chat2')" tabindex="3"><img src="images/deberes.png"><p>Chat de deberes</p></div>
+            </div>
+            <div class="usuariosConectados"></div>
+
+            <div id="contactos">
+            </div>
+           
+        </div>
+
+        <div id="contenedorMensajes" style="display: none;">
+            <div id="general">
+                <div class="header">
+                    <div class="tituloSalas">
+                    <img src="images/klipartz.com.png">
+                    <h1>Chat General</h1>
+                    </div>
+                    <div class="desconexion"></div>
+                    <div id="escribiendoMensaje"></div>
+                </div>
+                <div id="mensajesChat"></div>
+            </div>
+
+
+            <div id="contenedorMensajesSala1" style="display: none;">
+                <div class="header">
+                    <div class="tituloSalas">
+                        <img src="images/descarga.jpg">
+                        <h1>Chat de Crypto</h1>
+                        </div>
+                        <div class="desconexion"></div>
+                    <div id="escribiendoMensajeSala1"></div>
+                </div>
+                <div id="mensajesChatSala1"></div>
+            </div>
+
+            <div id="contenedorMensajesSala2" style="display: none;">
+                <div class="header">
+                    <div class="tituloSalas">
+                        <img src="images/deberes.png">
+                        <h1>Chat de deberes</h1>
+                    </div>
+                    <div class="desconexion"></div>
+                    <div id="escribiendoMensajeSala2"></div>
+                </div>
+                <div id="mensajesChatSala2"></div>
+            </div>
+
+            <div>
+                <div class="posibles-mensajes">
+                    <div class="textyenviar">
+                        <button id="toggleEmojis" onclick="toggleEmojis()">Emojis</button>
+                        <input type="text" name="" id="cajaTexto" onkeyup="usuarioEscribiendo()">
+                        <button onclick="enviar()">Enviar</button>
+                    </div>
+
+                    <div class="emojis" id="emojisContainer" style="display: none;">
+                        <img width="200" height="200" src="emojis/duo.webp" class="emoji" onclick="enviarEmoji('emojis/duo.webp')">
+                        <img width="200" height="200" src="emojis/jesus.webp" class="emoji" onclick="enviarEmoji('emojis/jesus.webp')">
+                        <img width="200" height="200" src="emojis/tiempo.webp" class="emoji" onclick="enviarEmoji('emojis/tiempo.webp ')">
+                        <img width="200" height="200" src="emojis/diablillo.png" class="emoji" onclick="enviarEmoji('emojis/diablillo.png')">
+                    </div>
+                    <!-- <form>
+                        <input type="file" id="sampleFile" name="sampleFile">
+                        <button type="button" id="uploadButton">Upload</button>
+                    </form> -->
+                </div>
+            </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="javascripts/index.js"></script>
+</body>
+
+</html>

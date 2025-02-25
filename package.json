@@ -1,0 +1,24 @@
+{
+  "name": "expressprueba",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "express-fileupload": "^1.4.3",
+    "firebase": "^10.8.0",
+    "mime-types": "^2.1.35",
+    "morgan": "~1.9.1",
+    "socket.io": "^4.7.4"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "nodemon": "^3.0.3"
+  }
+}

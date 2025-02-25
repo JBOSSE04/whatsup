@@ -1,0 +1,166 @@
+#!/usr/bin/env node
+const { Server } = require('socket.io');
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('expressprueba:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '4000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+const io = new Server(server);
+
+let connectedUsers = 0;
+const privateRooms = {};
+const users = {};
+
+io.on('connection', (socket) => {
+  let addedUser = false;
+
+  socket.on('add user', (userData) => {
+    if (addedUser) return;
+
+    socket.username = userData.nombreUsuario;
+    users[socket.id] = { 
+        username: userData.nombreUsuario,
+        avatar: userData.avatar,
+        sala: '' 
+    };
+    ++connectedUsers;
+    addedUser = true;
+
+    io.emit('user connected', { username: userData.nombreUsuario, emisorId: socket.id });
+    io.emit('updateUsers', Object.values(users).map(user => ({ username: user.username, avatar: user.avatar })));
+});
+
+  socket.on('disconnect', () => {
+    if (addedUser) {
+        const disconnectedUser = users[socket.id]; 
+        delete users[socket.id];
+        --connectedUsers;
+
+        io.emit('updateUsers', Object.values(users).map(user => ({ username: user.username, avatar: user.avatar })));
+        io.emit('user disconnected', disconnectedUser);
+    }
+});
+
+socket.on('mensaje', (data) => {
+  console.log('Evento mensaje recibido en el servidor:', data);
+  const { mensaje, sala } = data; // Extraer el mensaje y la sala de los datos recibidos
+  const username = users[socket.id].username;
+  console.log(`${username} envió un mensaje: ${mensaje} en la sala ${sala}`);
+  console.log('Enviando mensaje a sala:', sala);
+  io.emit('mensaje', { mensaje, emisor: username, emisorId: socket.id, sala });
+});
+
+socket.on('imagen', (datos) => {
+  const username = users[socket.id];
+  const { mensaje, sala } = datos;
+  console.log(`${username} envió una imagen.`);
+  io.emit('imagen', { datos, emisor: username, emisorId: socket.id, sala });
+});
+
+socket.on('entrarChatPrivado', ({ sala, nombreUsuario }) => {
+  socket.join(sala);
+  io.to(sala).emit('connectToRoom', `Bienvenido a la sala ${sala}, ${nombreUsuario}!`);
+});
+
+
+
+
+
+socket.on('escribiendo', (sala) => {
+  const username = users[socket.id];
+  console.log(`${username} está escribiendo en la sala ${sala}...`);
+  io.emit('escribiendo', { emisor: username, emisorId: socket.id, sala: sala });
+});
+
+socket.on('dejarEscribir', (sala) => {
+  io.emit('dejarEscribir', { emisorId: socket.id, sala: sala }); 
+});
+
+socket.on('nuevoArchivo', (archivo) => {
+  const { mensaje, sala } = archivo;
+  const username = users[socket.id];
+  io.emit('nuevoArchivo', { archivo, emisor: username, emisorId: socket.id, sala });
+});
+});
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
